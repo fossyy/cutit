@@ -7,6 +7,7 @@ import (
 	errorHandler "github.com/fossyy/cutit/handler/error"
 	indexHandler "github.com/fossyy/cutit/handler/index"
 	logoutHandler "github.com/fossyy/cutit/handler/logout"
+	miscHandler "github.com/fossyy/cutit/handler/misc"
 	signinHandler "github.com/fossyy/cutit/handler/signin"
 	signupHandler "github.com/fossyy/cutit/handler/signup"
 	userHandler "github.com/fossyy/cutit/handler/user"
@@ -22,6 +23,7 @@ func main() {
 		Addr:    serverAddr,
 		Handler: middleware.Handler(handler),
 	}
+
 	handler.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -58,6 +60,14 @@ func main() {
 
 	handler.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
 		middleware.Auth(logoutHandler.GET, w, r)
+	})
+
+	handler.HandleFunc("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
+		miscHandler.Robot(w, r)
+	})
+
+	handler.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		miscHandler.Favicon(w, r)
 	})
 
 	handler.HandleFunc("/{alias}", func(w http.ResponseWriter, r *http.Request) {

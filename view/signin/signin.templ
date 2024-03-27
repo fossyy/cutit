@@ -2,16 +2,11 @@ package signinView
 
 import (
     "github.com/fossyy/cutit/types"
+    "github.com/fossyy/cutit/view/layout"
 )
 
-templ headerComponent(title string) {
-	<head>
-	    <title>{ title }</title>
-        <link href="/public/output.css" rel="stylesheet"/>
-	</head>
-}
-
-templ form(err types.Message) {
+templ content(err types.Message, title string) {
+    @layout.Base(title){
         <div class="dark flex items-center min-h-screen p-4 sm:p-6 bg-gray-900">
           <div class="mx-auto w-full max-w-md space-y-8">
             <header class="text-center">
@@ -52,10 +47,9 @@ templ form(err types.Message) {
             </div>
           </div>
         </div>
-
+    }
 }
 
 templ Main(title string, err types.Message) {
-    @headerComponent(title)
-	@form(err)
+	@content(err, title)
 }
