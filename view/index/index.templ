@@ -8,7 +8,7 @@ import (
 	"github.com/fossyy/cutit/view/layout"
 )
 
-templ content(title string, err types.Message, links []db.Link, host string) {
+templ content(title string, err types.Message, links []*db.Link, host string) {
     @layout.Base(title){
     <div class="flex justify-center items-center dark items-center min-h-screen p-4 sm:p-6 bg-gray-900">
             <div class="rounded-lg border bg-card text-card-foreground shadow-sm w-full max-w-lg dark" data-v0-t="card">
@@ -95,6 +95,6 @@ templ content(title string, err types.Message, links []db.Link, host string) {
     }
 }
 
-templ Main(title string, err types.Message, links []db.Link, host string) {
+templ Main(title string, err types.Message, links []*db.Link, host string) {
 	@content(title, err, links, host)
 }
