@@ -1,6 +1,7 @@
 package indexHandler
 
 import (
+	"github.com/fossyy/cutit/app"
 	"github.com/fossyy/cutit/db"
 	"github.com/fossyy/cutit/middleware"
 	"github.com/fossyy/cutit/types"
@@ -14,8 +15,11 @@ func GET(w http.ResponseWriter, r *http.Request) {
 	userSession := middleware.GetUser(session)
 	host := r.Host
 
-	var links []db.Link
-	db.DB.Table("links").Where("owner_id = ?", userSession.UserID).Find(&links)
+	links, err := app.Server.Database.GetLinks(userSession.UserID.String())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	component := indexView.Main("main page", types.Message{
 		Code:    3,
@@ -37,23 +41,21 @@ func POST(w http.ResponseWriter, r *http.Request) {
 		Alias:   alias,
 		OwnerID: userSession.UserID,
 	}
-	err := db.DB.Create(&link).Error
+	err := app.Server.Database.CreateLink(&link)
 	if err != nil {
-		var links []db.Link
-		component := indexView.Main("main page", types.Message{
-			Code:    0,
-			Message: "Error : " + err.Error(),
-		}, links, host)
-		component.Render(r.Context(), w)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	var links []db.Link
-	db.DB.Table("links").Where("owner_id = ?", userSession.UserID).Find(&links)
+	links, err := app.Server.Database.GetLinks(userSession.UserID.String())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	component := indexView.Main("main page", types.Message{
-		Code:    1,
-		Message: "Short url berhasil dibuat dengan alias " + alias,
+		Code:    3,
+		Message: "",
 	}, links, host)
 	component.Render(r.Context(), w)
 }

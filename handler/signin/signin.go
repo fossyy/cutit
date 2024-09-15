@@ -1,7 +1,7 @@
 package signinHandler
 
 import (
-	"github.com/fossyy/cutit/db"
+	"github.com/fossyy/cutit/app"
 	"github.com/fossyy/cutit/middleware"
 	"github.com/fossyy/cutit/types"
 	"github.com/fossyy/cutit/utils"
@@ -26,20 +26,22 @@ func POST(w http.ResponseWriter, r *http.Request) {
 	}
 	email := r.Form.Get("email")
 	password := r.Form.Get("password")
-	var userData db.User
 
-	if err := db.DB.Table("users").Where("email = ?", email).First(&userData).Error; err != nil {
+	user, err := app.Server.Database.GetUser(email)
+	if err != nil {
 		component := signinView.Main("Sign in Page", types.Message{
 			Code:    0,
 			Message: "Database error : " + err.Error(),
 		})
 		component.Render(r.Context(), w)
+		return
 	}
-	if email == userData.Email && utils.CheckPasswordHash(password, userData.Password) {
+
+	if email == user.Email && utils.CheckPasswordHash(password, user.Password) {
 		session.Values["user"] = types.User{
-			UserID:        userData.UserID,
+			UserID:        user.UserID,
 			Email:         email,
-			Username:      userData.Username,
+			Username:      user.Username,
 			Authenticated: true,
 		}
 		err = session.Save(r, w)

@@ -1,6 +1,7 @@
 package signupHandler
 
 import (
+	"github.com/fossyy/cutit/app"
 	"github.com/fossyy/cutit/db"
 	"github.com/fossyy/cutit/types"
 	"github.com/fossyy/cutit/utils"
@@ -34,9 +35,7 @@ func POST(w http.ResponseWriter, r *http.Request) {
 		Email:    email,
 		Password: hashedPassword,
 	}
-
-	err = db.DB.Create(&newUser).Error
-
+	err = app.Server.Database.CreateUser(&newUser)
 	if err != nil {
 		component := signupView.Main("Sign up Page", types.Message{
 			Code:    0,
@@ -45,10 +44,10 @@ func POST(w http.ResponseWriter, r *http.Request) {
 		component.Render(r.Context(), w)
 		return
 	}
-
 	component := signupView.Main("Sign up Page", types.Message{
 		Code:    1,
 		Message: "User creation success",
 	})
 	component.Render(r.Context(), w)
+	return
 }

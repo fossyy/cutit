@@ -1,2 +1,7 @@
 /tmp
 /public/output.css
+/.idea
+
+.env
+
+*_templ.txt
