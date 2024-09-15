@@ -11,7 +11,7 @@ import (
 func main() {
 	handler := routes.Setup()
 	database := db.NewMYSQLdb("root", "Password123", "localhost", "3306", "testaja")
-	server := app.NewApp("localhost:8000", handler, database)
+	server := app.NewApp("0.0.0.0:8000", handler, database)
 
 	app.Server = server
 
