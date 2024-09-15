@@ -1,12 +1,27 @@
 package utils
 
 import (
+	"fmt"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
 	"net/http"
+	"os"
 	"strings"
+	"sync"
 	"time"
 )
+
+type Env struct {
+	value map[string]string
+	mu    sync.Mutex
+}
+
+var env *Env
+
+func init() {
+	env = &Env{value: map[string]string{}}
+}
 
 func ClientIP(request *http.Request) string {
 	ip := request.Header.Get("X-Real-IP")
@@ -49,4 +64,24 @@ func GenerateRandomString(length int) string {
 		result.WriteString(string(charset[randomIndex]))
 	}
 	return result.String()
+}
+
+func Getenv(key string) string {
+	env.mu.Lock()
+	defer env.mu.Unlock()
+	if val, ok := env.value[key]; ok {
+		return val
+	}
+
+	if os.Getenv("HOSTNAME") == "" {
+		err := godotenv.Load(".env")
+		if err != nil {
+			fmt.Printf("Error loading .env file: %s \n", err)
+		}
+	}
+
+	val := os.Getenv(key)
+	env.value[key] = val
+
+	return val
 }
